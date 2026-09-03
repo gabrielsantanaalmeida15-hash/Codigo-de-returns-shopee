@@ -2,7 +2,7 @@
 
 Sistema web para gerenciamento de devolucoes, com areas separadas para clientes e atendentes.
 
-## O que foi utilizado
+O que foi utilizado
 
 - **HTML5**: estrutura semantica das telas, formularios, tabelas e navegacao.
 - **CSS3**: layout responsivo, variaveis de cores, estados visuais, grid e media queries.
@@ -13,7 +13,7 @@ Sistema web para gerenciamento de devolucoes, com areas separadas para clientes 
 
 O projeto nao utiliza frameworks, bibliotecas externas, banco de dados remoto ou servidor backend.
 
-## Estrutura
+Estrutura
 
 ```text
 .
@@ -26,9 +26,9 @@ O projeto nao utiliza frameworks, bibliotecas externas, banco de dados remoto ou
 └── README.md                   # Documentacao do projeto
 ```
 
-## Perfis de acesso
+Perfis de acesso
 
-### Cliente
+ Cliente
 
 - Visualiza o painel pessoal.
 - Consulta suas devolucoes.
@@ -36,7 +36,7 @@ O projeto nao utiliza frameworks, bibliotecas externas, banco de dados remoto ou
 - Seleciona pedidos e produtos cadastrados.
 - Acessa seus dados e perfil.
 
-### Atendente
+Atendente
 
 - Visualiza o painel operacional.
 - Consulta a fila de devolucoes.
@@ -44,7 +44,7 @@ O projeto nao utiliza frameworks, bibliotecas externas, banco de dados remoto ou
 - Avanca o status de uma solicitacao de `Pendente` para `Em analise` e depois para `Aprovada`.
 - Gerencia pedidos e produtos no banco local.
 
-## Credenciais de demonstracao
+Credenciais de demonstracao
 
 | Perfil | E-mail | Senha |
 |---|---|---|
@@ -53,7 +53,7 @@ O projeto nao utiliza frameworks, bibliotecas externas, banco de dados remoto ou
 
 O botao de troca no canto superior direito encerra a sessao atual e solicita um novo login para o outro perfil.
 
-## Banco de dados local
+Banco de dados local
 
 A area **Banco de dados** permite:
 
@@ -71,7 +71,7 @@ Os dados sao armazenados no navegador com estas chaves:
 
 Como os dados estao no `localStorage`, eles ficam restritos ao navegador e ao dispositivo atual. Limpar os dados do navegador remove os registros. A sincronizacao entre abas funciona no mesmo navegador, mas ainda nao e uma sincronizacao entre usuarios ou dispositivos.
 
-## Como executar
+Como executar
 
 1. Clone ou baixe o repositorio.
 2. Abra `shopee-returns-system.html` diretamente no navegador, ou use a extensao **Live Server** no VS Code.
@@ -79,7 +79,7 @@ Como os dados estao no `localStorage`, eles ficam restritos ao navegador e ao di
 
 Como os arquivos CSS e JavaScript usam caminhos relativos, mantenha a estrutura de pastas original.
 
-## Fluxo principal
+Fluxo principal
 
 1. O usuario escolhe o perfil no login.
 2. O sistema valida as credenciais de demonstracao.
@@ -89,17 +89,17 @@ Como os arquivos CSS e JavaScript usam caminhos relativos, mantenha a estrutura 
 6. O atendente visualiza a mesma base e atualiza o status.
 7. Outras abas recebem a alteracao por meio do evento `storage`.
 
-## Publicacao
+Publicacao
 
 Repositorio GitHub:
 
 https://github.com/gabrielsantanaalmeida15-hash/Codigo-de-returns-shopee
 
-## Backend de producao
+Backend de producao
 
 A pasta `backend/` contem uma API Express pronta para substituir o `localStorage` quando o ambiente de producao estiver configurado.
 
-### Estrutura do backend
+Estrutura do backend
 
 ```text
 backend/
@@ -116,7 +116,7 @@ backend/
 └── package.json
 ```
 
-### Seguranca implementada
+Seguranca implementada
 
 - JWT com expiracao de 8 horas.
 - Senhas armazenadas com `bcrypt` e custo 12.
@@ -129,7 +129,7 @@ backend/
 - Auditoria de criacao, alteracao de status e upload.
 - Notificacao persistida quando o atendente altera uma devolucao.
 
-### Executar a API localmente
+Executar a API localmente
 
 ```bash
 cd backend
@@ -153,23 +153,3 @@ Endpoints principais:
 - `POST /api/returns/:id/attachments`
 - `GET /api/notifications`
 - `GET /api/audit-logs` (atendente)
-
-### Testes
-
-```bash
-cd backend
-npm test
-```
-
-Os testes verificam que endpoints protegidos rejeitam requisicoes sem token. Para testes completos de integracao, inicie um PostgreSQL de teste e adicione variaveis isoladas no pipeline.
-
-### Deploy com HTTPS
-
-O arquivo `backend/nginx/default.conf` redireciona HTTP para HTTPS e encaminha `/api/` para a API. Em producao:
-
-1. Configure `.env` com uma senha forte, `DATABASE_URL` seguro e `JWT_SECRET` com pelo menos 32 caracteres.
-2. Coloque o certificado e a chave em `backend/certs/fullchain.pem` e `backend/certs/privkey.pem`.
-3. Execute `docker compose -f docker-compose.prod.yml up -d --build` dentro de `backend`.
-4. Use certificados reais, renovacao automatica e backups do PostgreSQL.
-
-O frontend antigo continua funcional para demonstracao com `localStorage`; a integracao dele com a API deve ser feita em uma etapa seguinte, trocando as funcoes de leitura e escrita locais por chamadas autenticadas.
