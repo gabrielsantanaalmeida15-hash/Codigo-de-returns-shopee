@@ -95,14 +95,81 @@ Repositorio GitHub:
 
 https://github.com/gabrielsantanaalmeida15-hash/Codigo-de-returns-shopee
 
-## Proximos passos recomendados
+## Backend de producao
 
-Para transformar o prototipo em um sistema de producao, recomenda-se adicionar:
+A pasta `backend/` contem uma API Express pronta para substituir o `localStorage` quando o ambiente de producao estiver configurado.
 
-- Backend com API autenticada.
-- Banco de dados real, como PostgreSQL ou MySQL.
-- Hash de senhas e controle de permissoes no servidor.
-- Upload de imagens para armazenamento seguro.
-- Logs, auditoria e notificacoes.
-- Testes automatizados.
-- Deploy com HTTPS.
+### Estrutura do backend
+
+```text
+backend/
+├── src/
+│   ├── db.js              # Pool PostgreSQL
+│   └── server.js          # API, autenticacao e autorizacao
+├── db/schema.sql          # Tabelas, enums, indices e relacionamentos
+├── tests/api.test.js      # Testes de endpoints protegidos
+├── nginx/default.conf     # HTTPS e proxy reverso
+├── Dockerfile
+├── docker-compose.yml     # PostgreSQL local
+├── docker-compose.prod.yml
+├── .env.example
+└── package.json
+```
+
+### Seguranca implementada
+
+- JWT com expiracao de 8 horas.
+- Senhas armazenadas com `bcrypt` e custo 12.
+- Controle de acesso por papel: `client` e `agent`.
+- `helmet`, CORS configuravel e rate limit no login.
+- Validacao de payloads com Zod.
+- Queries parametrizadas contra SQL injection.
+- Upload limitado a 5 arquivos de ate 10 MB, aceitando imagem e video.
+- Nome aleatorio para arquivos enviados, sem expor o nome original no caminho.
+- Auditoria de criacao, alteracao de status e upload.
+- Notificacao persistida quando o atendente altera uma devolucao.
+
+### Executar a API localmente
+
+```bash
+cd backend
+copy .env.example .env
+docker compose up -d postgres
+npm install
+npm run dev
+```
+
+API: `http://localhost:3000`
+
+Endpoints principais:
+
+- `GET /health`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/products` e `POST /api/products` (atendente)
+- `GET /api/orders` e `POST /api/orders` (atendente)
+- `GET /api/returns` e `POST /api/returns` (cliente)
+- `PATCH /api/returns/:id/status` (atendente)
+- `POST /api/returns/:id/attachments`
+- `GET /api/notifications`
+- `GET /api/audit-logs` (atendente)
+
+### Testes
+
+```bash
+cd backend
+npm test
+```
+
+Os testes verificam que endpoints protegidos rejeitam requisicoes sem token. Para testes completos de integracao, inicie um PostgreSQL de teste e adicione variaveis isoladas no pipeline.
+
+### Deploy com HTTPS
+
+O arquivo `backend/nginx/default.conf` redireciona HTTP para HTTPS e encaminha `/api/` para a API. Em producao:
+
+1. Configure `.env` com uma senha forte, `DATABASE_URL` seguro e `JWT_SECRET` com pelo menos 32 caracteres.
+2. Coloque o certificado e a chave em `backend/certs/fullchain.pem` e `backend/certs/privkey.pem`.
+3. Execute `docker compose -f docker-compose.prod.yml up -d --build` dentro de `backend`.
+4. Use certificados reais, renovacao automatica e backups do PostgreSQL.
+
+O frontend antigo continua funcional para demonstracao com `localStorage`; a integracao dele com a API deve ser feita em uma etapa seguinte, trocando as funcoes de leitura e escrita locais por chamadas autenticadas.
